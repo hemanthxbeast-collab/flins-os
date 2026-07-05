@@ -2,7 +2,7 @@
 
 Your own voice-driven AI command center. Skills + memory + voice, 100% local where it counts, forkable per client.
 
-Built by [hemanthxbeast-collab](https://github.com/hemanthxbeast-collab).
+Built by [hemanthxbeast](https://github.com/hemanthxbeast-collab).
 
 ## Status
 
