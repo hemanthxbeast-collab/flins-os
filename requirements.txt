@@ -1,0 +1,17 @@
+# Step 1: core skill loader + vault
+python-dotenv>=1.0.0
+
+# Cloud model (default: Gemini, free tier)
+google-genai>=0.3.0
+
+# Optional alternative provider
+anthropic>=0.40.0
+
+# Step 3: voice (local STT + TTS)
+faster-whisper>=1.0.0
+sounddevice>=0.4.6
+soundfile>=0.12.1
+kokoro-onnx>=0.4.0
+
+# Step 4: HUD
+flask>=3.0.0

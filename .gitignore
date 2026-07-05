@@ -1,0 +1,22 @@
+# Secrets — never commit
+.env
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Voice models — too large for git (300MB+), downloaded via setup instructions instead
+voice/models/
+
+# Personal memory — this is Hemanth's own vault content, not part of the template
+vault/logs/*.md
+vault/research/*.md
+vault/projects/*.md
+
+# HUD — built but not currently used; kept in repo for later, safe to ignore for now
+# (not excluded — code stays, just optional to run)
+
+# OS junk
+.DS_Store
+Thumbs.db

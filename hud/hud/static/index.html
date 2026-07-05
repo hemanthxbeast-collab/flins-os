@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>F.L.I.N.S. — Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e14;
+    --panel: #11151c;
+    --panel-border: #1f2937;
+    --text-primary: #e2e8f0;
+    --text-dim: #5b6472;
+    --green: #39ff88;
+    --purple: #a78bfa;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--sans);
+    height: 100vh;
+    overflow: hidden;
+    background-image:
+      radial-gradient(circle at 50% 0%, rgba(167,139,250,0.06), transparent 60%);
+  }
+
+  .frame {
+    height: 100vh;
+    display: grid;
+    grid-template-rows: 48px 1fr 40px;
+    padding: 14px;
+    gap: 12px;
+  }
+
+  /* Top bar */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--panel-border);
+    padding-bottom: 10px;
+  }
+  .topbar .brand { color: var(--purple); font-weight: 700; font-size: 13px; }
+  .topbar nav { display: flex; gap: 22px; }
+  .topbar nav span { cursor: default; }
+  .topbar nav span.active { color: var(--green); }
+  .topbar .clock { color: var(--text-primary); font-size: 13px; }
+
+  /* Main grid */
+  .main {
+    display: grid;
+    grid-template-columns: 260px 1fr 280px;
+    gap: 14px;
+    min-height: 0;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .panel::before {
+    /* taped-corner accent, echoing the mockup's washi-tape frame */
+    content: '';
+    position: absolute;
+    top: -1px; right: 14px;
+    width: 34px; height: 10px;
+    background: rgba(255,255,255,0.05);
+    transform: rotate(3deg);
+    border-radius: 2px;
+  }
+
+  .panel h2 {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+
+  /* Metrics panel */
+  .metric {
+    margin-bottom: 18px;
+  }
+  .metric .label {
+    font-size: 10px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .metric .value {
+    font-family: var(--mono);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--green);
+    margin-top: 2px;
+  }
+
+  /* Voice / center panel */
+  .voice-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  #sphere {
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 1;
+  }
+  .voice-status {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--purple);
+    letter-spacing: 0.1em;
+    margin-top: 8px;
+  }
+  .voice-count {
+    font-family: var(--mono);
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+  }
+  .response-text {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--text-primary);
+    max-width: 360px;
+    text-align: center;
+    margin-top: 14px;
+    min-height: 20px;
+    line-height: 1.5;
+  }
+  .query-box {
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
+    width: 100%;
+    max-width: 360px;
+  }
+  .query-box input {
+    flex: 1;
+    background: #0d1017;
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 9px 12px;
+    color: var(--text-primary);
+    font-family: var(--sans);
+    font-size: 13px;
+    outline: none;
+  }
+  .query-box input:focus {
+    border-color: var(--purple);
+  }
+  .query-box button {
+    background: rgba(167,139,250,0.12);
+    border: 1px solid var(--purple);
+    color: var(--purple);
+    border-radius: 6px;
+    padding: 9px 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+  }
+  .query-box button:hover {
+    background: rgba(167,139,250,0.22);
+  }
+  .query-box button:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  /* Skills panel */
+  .skill-branch {
+    margin-bottom: 14px;
+  }
+  .skill-branch .branch-name {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 6px;
+  }
+  .skill-item {
+    font-size: 12px;
+    color: var(--text-primary);
+    padding: 3px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .skill-item::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    flex-shrink: 0;
+  }
+
+  /* Bottom bar - recent logs ticker */
+  .bottombar {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    border-top: 1px solid var(--panel-border);
+    padding-top: 10px;
+    display: flex;
+    gap: 26px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .bottombar .log-entry span { color: var(--text-primary); }
+
+  .empty-state {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="topbar">
+    <div class="brand">F.L.I.N.S.</div>
+    <nav>
+      <span class="active">HOME</span>
+      <span>SKILLS</span>
+      <span>VAULT</span>
+      <span>VOICE</span>
+      <span>MEMORY</span>
+    </nav>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+
+  <div class="main">
+    <div class="panel">
+      <h2>Metrics</h2>
+      <div class="metric">
+        <div class="label">Total Memories</div>
+        <div class="value" id="metric-total">0</div>
+      </div>
+      <div class="metric">
+        <div class="label">Logs Folder</div>
+        <div class="value" id="metric-logs">0</div>
+      </div>
+      <div class="metric">
+        <div class="label">Research Folder</div>
+        <div class="value" id="metric-research">0</div>
+      </div>
+      <div class="metric">
+        <div class="label">Skills Installed</div>
+        <div class="value" id="metric-skills">0</div>
+      </div>
+    </div>
+
+    <div class="panel voice-panel">
+      <svg id="sphere" viewBox="0 0 400 400"></svg>
+      <div class="voice-status" id="voice-status">STANDBY</div>
+      <div id="response-text" class="response-text"></div>
+      <div class="query-box">
+        <input type="text" id="query-input" placeholder="Ask FLINS anything..." autocomplete="off">
+        <button id="query-submit">SEND</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Skills</h2>
+      <div id="skills-list"><div class="empty-state">Loading...</div></div>
+    </div>
+  </div>
+
+  <div class="bottombar" id="bottombar">
+    <div class="log-entry">Connecting to vault...</div>
+  </div>
+</div>
+
+<script>
+async function fetchJSON(url) {
+  try {
+    const res = await fetch(url);
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
+
+function updateClock() {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-GB');
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+async function refreshVault() {
+  const stats = await fetchJSON('/api/vault-stats');
+  if (!stats) return;
+  document.getElementById('metric-total').textContent = stats.total_notes;
+  document.getElementById('metric-logs').textContent = stats.folders.logs || 0;
+  document.getElementById('metric-research').textContent = stats.folders.research || 0;
+}
+
+async function refreshSkills() {
+  const skills = await fetchJSON('/api/skills');
+  if (!skills) return;
+  const container = document.getElementById('skills-list');
+  container.innerHTML = '';
+  let total = 0;
+  for (const branch in skills) {
+    total += skills[branch].length;
+    const branchDiv = document.createElement('div');
+    branchDiv.className = 'skill-branch';
+    branchDiv.innerHTML = `<div class="branch-name">${branch}</div>` +
+      skills[branch].map(s => `<div class="skill-item">${s}</div>`).join('');
+    container.appendChild(branchDiv);
+  }
+  document.getElementById('metric-skills').textContent = total;
+}
+
+async function refreshLogs() {
+  const logs = await fetchJSON('/api/recent-logs');
+  const bar = document.getElementById('bottombar');
+  if (!logs || logs.length === 0) {
+    bar.innerHTML = '<div class="log-entry">No memory entries yet — talk to FLINS to populate the vault.</div>';
+    return;
+  }
+  bar.innerHTML = logs.map(l => `<div class="log-entry"><span>${l.title}</span></div>`).join('');
+}
+
+async function refreshAll() {
+  await Promise.all([refreshVault(), refreshSkills(), refreshLogs()]);
+}
+refreshAll();
+setInterval(refreshAll, 4000);
+
+/* --- Query box wiring --- */
+const input = document.getElementById('query-input');
+const submitBtn = document.getElementById('query-submit');
+const responseEl = document.getElementById('response-text');
+const statusEl = document.getElementById('voice-status');
+
+async function sendQuery() {
+  const query = input.value.trim();
+  if (!query) return;
+
+  input.value = '';
+  submitBtn.disabled = true;
+  statusEl.textContent = 'THINKING';
+  responseEl.textContent = '';
+
+  try {
+    const res = await fetch('/api/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query }),
+    });
+    const data = await res.json();
+    responseEl.textContent = data.response || data.error || 'No response.';
+  } catch (e) {
+    responseEl.textContent = 'Could not reach FLINS server.';
+  }
+
+  statusEl.textContent = 'STANDBY';
+  submitBtn.disabled = false;
+  refreshAll();
+}
+
+submitBtn.addEventListener('click', sendQuery);
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') sendQuery();
+});
+
+/* --- Particle sphere centerpiece, echoing the V.A.U.L.T mockup --- */
+const svg = document.getElementById('sphere');
+const NS = 'http://www.w3.org/2000/svg';
+const numPoints = 220;
+const radius = 140;
+const points = [];
+
+for (let i = 0; i < numPoints; i++) {
+  const phi = Math.acos(-1 + (2 * i) / numPoints);
+  const theta = Math.sqrt(numPoints * Math.PI) * phi;
+  points.push({ phi, theta, twinkle: Math.random() * Math.PI * 2 });
+}
+
+const dots = points.map(() => {
+  const c = document.createElementNS(NS, 'circle');
+  c.setAttribute('r', '1.6');
+  c.setAttribute('fill', '#a78bfa');
+  svg.appendChild(c);
+  return c;
+});
+
+let angle = 0;
+function animateSphere() {
+  angle += 0.004;
+  points.forEach((p, i) => {
+    const x = radius * Math.sin(p.phi) * Math.cos(p.theta + angle);
+    const y = radius * Math.sin(p.phi) * Math.sin(p.theta + angle);
+    const z = radius * Math.cos(p.phi);
+    const scale = (z + radius * 1.4) / (radius * 2.4);
+    const screenX = 200 + x;
+    const screenY = 200 + y * 0.9;
+    const twinkle = 0.5 + 0.5 * Math.sin(Date.now() / 600 + p.twinkle);
+
+    dots[i].setAttribute('cx', screenX);
+    dots[i].setAttribute('cy', screenY);
+    dots[i].setAttribute('r', 0.8 + scale * 1.8);
+    dots[i].setAttribute('opacity', (0.15 + scale * 0.7) * twinkle);
+  });
+  requestAnimationFrame(animateSphere);
+}
+animateSphere();
+</script>
+</body>
+</html>
