@@ -14,6 +14,7 @@ from tts import speak
 from skill_loader import discover_skills, load_relevant_skills
 from vault_writer import write_note
 from router import route
+import actions
 
 EXIT_PHRASES = ("stop listening", "goodbye flins", "exit flins", "shut down flins")
 
@@ -28,6 +29,15 @@ def build_context(query: str) -> str:
 
 
 def handle_query(query: str) -> str:
+    action_result = actions.try_action(query)
+    if action_result:
+        write_note(
+            title=query[:50],
+            content=f"**Query:** {query}\n\n**Action result:** {action_result}",
+            folder="logs",
+        )
+        return action_result
+
     context = build_context(query)
     response = route(query, context, voice_mode=True)
     write_note(

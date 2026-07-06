@@ -11,6 +11,7 @@ sys.path.append(os.path.dirname(__file__))
 from skill_loader import discover_skills, load_relevant_skills
 from vault_writer import write_note
 from router import route
+import actions
 
 # Loaded once at startup — cheap, just metadata + triggers, no file content yet
 ALL_SKILLS = discover_skills()
@@ -27,6 +28,16 @@ def build_context(query: str) -> str:
 
 
 def handle_query(query: str) -> str:
+    # Check real system actions first — zero API cost, deterministic, no LLM involved
+    action_result = actions.try_action(query)
+    if action_result:
+        write_note(
+            title=query[:50],
+            content=f"**Query:** {query}\n\n**Action result:** {action_result}",
+            folder="logs",
+        )
+        return action_result
+
     context = build_context(query)
     response = route(query, context)
     write_note(

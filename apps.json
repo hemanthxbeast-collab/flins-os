@@ -1,0 +1,5 @@
+{
+  "_comment": "Add your own app mappings here. Key = what you'll say to FLINS, value = the command/path Windows should run. This file overrides/extends the built-in defaults in core/os_control.py.",
+  "davinci": "C:\\Program Files\\Blackmagic Design\\DaVinci Resolve\\Resolve.exe",
+  "genshin": "C:\\Program Files\\Genshin Impact\\Genshin Impact game\\GenshinImpact.exe"
+}
