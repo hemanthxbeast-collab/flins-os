@@ -20,3 +20,7 @@ vault/projects/*.md
 # OS junk
 .DS_Store
 Thumbs.db
+
+# Obsidian's personal workspace state - not needed for the repo/template
+.obsidian/
+vault/.obsidian/
